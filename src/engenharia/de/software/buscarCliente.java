@@ -5,6 +5,21 @@
  */
 package engenharia.de.software;
 
+import Bean.Cliente;
+import Controle.Conexao;
+import DAO.ModeloTabela;
+import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+
+
 /**
  *
  * @author Tiago Oliveira
@@ -130,7 +145,7 @@ public class buscarCliente extends javax.swing.JFrame {
                     .addComponent(jButton2))
                 .addGap(18, 18, 18)
                 .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 216, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 238, Short.MAX_VALUE)
                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -146,27 +161,21 @@ public class buscarCliente extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        dispose();
-        telaPrincipal co = new telaPrincipal();
-        co.setVisible(true);
-        co.setLocationRelativeTo(null);
-        co.setSize(800, 600);
+            Cliente c = new Cliente();
+            BuscarNomeCliente("_nome", c.getNome());
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+             Cliente c = new Cliente();
+            BuscarCpfCliente("_cpf", c.getCpf()); 
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void nome_completo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nome_completo1ActionPerformed
@@ -218,4 +227,113 @@ public class buscarCliente extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField nome_completo1;
     // End of variables declaration//GEN-END:variables
+
+    private void BuscarNomeCliente(String busca, String valor) {
+        ResultSet rs = null;
+        Connection con = Conexao.getConnection();
+        PreparedStatement stmt = null;
+        ArrayList dados = new ArrayList();
+        String[] Colunas = new String[]{"Nome", "Nome da Mãe", "Telefone", "Idade", "Sexo"};
+        
+        int cont = 0;
+        try {
+            //select pessoa.nome_completo from (select aluno.Id_pessoaFK as id from (select * from academia where academia.nome_academia="Academia Sol") as acad inner join aluno on aluno.Id_academiaFK = acad.Id_academia) as alu inner join pessoa on pessoa.Id_pessoa = alu.id;
+            stmt = con.prepareStatement("SELECT * FROM clientes WHERE "+busca+" LIKE '%"+valor+"%'");
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                dados.add(new Object[]{rs.getString("_nome"), rs.getString("_cpf"), rs.getString("_tel"), rs.getInt("_idade"), rs.getString("_sex")});
+                cont++;
+            }
+                
+            if(cont == 0){
+                JOptionPane.showMessageDialog(null, "Não Foram Encontrados Registros Para:  "+ valor);
+            }else{
+            
+                ModeloTabela modelo = new ModeloTabela(dados, Colunas);
+
+                table.setModel(modelo);
+
+                table.getColumnModel().getColumn(0).setPreferredWidth(216);
+                table.getColumnModel().getColumn(0).setResizable(false);
+
+                table.getColumnModel().getColumn(1).setPreferredWidth(216);
+                table.getColumnModel().getColumn(1).setResizable(false);
+
+                table.getColumnModel().getColumn(2).setPreferredWidth(155);
+                table.getColumnModel().getColumn(2).setResizable(false);
+
+                table.getColumnModel().getColumn(3).setPreferredWidth(150);
+                table.getColumnModel().getColumn(3).setResizable(false);
+
+                table.getColumnModel().getColumn(4).setPreferredWidth(150);
+                table.getColumnModel().getColumn(4).setResizable(false);
+
+                table.getTableHeader().setReorderingAllowed(false);
+                table.setAutoResizeMode(table.AUTO_RESIZE_OFF);
+
+                table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(buscarCliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void BuscarCpfCliente(String busca, String valor) {
+        ResultSet rs = null;
+        Connection con = Conexao.getConnection();
+        PreparedStatement stmt = null;
+        ArrayList dados = new ArrayList();
+        String[] Colunas = new String[]{"Nome", "Nome da Mãe", "Telefone", "Idade", "Sexo"};
+        String nomeac = null;
+        int cont = 0;
+        try {
+            
+            stmt = con.prepareStatement("SELECT * FROM clientes WHERE "+busca+" LIKE '%"+valor+"%'");
+            rs = stmt.executeQuery();
+            
+            
+            while(rs.next()){
+                dados.add(new Object[]{rs.getString("_nome"), rs.getString("_cpf"), rs.getString("_tel"), rs.getInt("_idade"), rs.getString("_sex")});
+                cont++;
+            }
+                
+            if(cont == 0){
+                JOptionPane.showMessageDialog(null, "Não Foram Encontrados Registros Para:  "+ busca);
+            }else{
+                
+                ModeloTabela modelo = new ModeloTabela(dados, Colunas);
+
+                table.setModel(modelo);
+
+                table.getColumnModel().getColumn(0).setPreferredWidth(216);
+                table.getColumnModel().getColumn(0).setResizable(false);
+
+                table.getColumnModel().getColumn(1).setPreferredWidth(216);
+                table.getColumnModel().getColumn(1).setResizable(false);
+
+                table.getColumnModel().getColumn(2).setPreferredWidth(155);
+                table.getColumnModel().getColumn(2).setResizable(false);
+
+                table.getColumnModel().getColumn(3).setPreferredWidth(150);
+                table.getColumnModel().getColumn(3).setResizable(false);
+
+                table.getColumnModel().getColumn(4).setPreferredWidth(150);
+                table.getColumnModel().getColumn(4).setResizable(false);
+
+                table.getTableHeader().setReorderingAllowed(false);
+                table.setAutoResizeMode(table.AUTO_RESIZE_OFF);
+
+                table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(buscarCliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }
+
+ 
