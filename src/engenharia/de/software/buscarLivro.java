@@ -5,6 +5,20 @@
  */
 package engenharia.de.software;
 
+import Bean.Livro;
+import Controle.Conexao;
+import DAO.ModeloTabela;
+import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+
 /**
  *
  * @author Tiago Oliveira
@@ -158,16 +172,13 @@ public class buscarLivro extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        dispose();
-        telaPrincipal co = new telaPrincipal();
-        co.setVisible(true);
-        co.setLocationRelativeTo(null);
-        co.setSize(800, 600);
+            Livro l = new Livro();
+            BuscarNomeLivro("_titulo", l.getTitulo());
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+            Livro l = new Livro();
+            BuscarAnoLivro("_ano", l.getAno()); 
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void nome_completo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nome_completo1ActionPerformed
@@ -224,4 +235,111 @@ public class buscarLivro extends javax.swing.JFrame {
     private javax.swing.JTextField nome_completo1;
     private javax.swing.JTextField nome_completo2;
     // End of variables declaration//GEN-END:variables
+
+    private void BuscarNomeLivro(String busca, String titulo) {
+        ResultSet rs = null;
+        Connection con = Conexao.getConnection();
+        PreparedStatement stmt = null;
+        ArrayList dados = new ArrayList();
+        String[] Colunas = new String[]{"Titulo", "Autor", "Genero", "Ano", "Valor"};
+        
+        int cont = 0;
+        try {
+            //select pessoa.nome_completo from (select aluno.Id_pessoaFK as id from (select * from academia where academia.nome_academia="Academia Sol") as acad inner join aluno on aluno.Id_academiaFK = acad.Id_academia) as alu inner join pessoa on pessoa.Id_pessoa = alu.id;
+            stmt = con.prepareStatement("SELECT * FROM livro WHERE "+busca+"");
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                dados.add(new Object[]{rs.getString("_titulo"), rs.getString("_autor"), rs.getString("_genero"), rs.getInt("_ano"), rs.getString("_valor")});
+                cont++;
+            }
+                
+            if(cont == 0){
+                JOptionPane.showMessageDialog(null, "Não Foram Encontrados Registros Para:  "+ busca);
+            }else{
+            
+                ModeloTabela modelo = new ModeloTabela(dados, Colunas);
+
+                table.setModel(modelo);
+
+                table.getColumnModel().getColumn(0).setPreferredWidth(216);
+                table.getColumnModel().getColumn(0).setResizable(false);
+
+                table.getColumnModel().getColumn(1).setPreferredWidth(216);
+                table.getColumnModel().getColumn(1).setResizable(false);
+
+                table.getColumnModel().getColumn(2).setPreferredWidth(155);
+                table.getColumnModel().getColumn(2).setResizable(false);
+
+                table.getColumnModel().getColumn(3).setPreferredWidth(150);
+                table.getColumnModel().getColumn(3).setResizable(false);
+
+                table.getColumnModel().getColumn(4).setPreferredWidth(150);
+                table.getColumnModel().getColumn(4).setResizable(false);
+
+                table.getTableHeader().setReorderingAllowed(false);
+                table.setAutoResizeMode(table.AUTO_RESIZE_OFF);
+
+                table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(buscarLivro.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void BuscarAnoLivro(String busca, String ano) {
+        ResultSet rs = null;
+        Connection con = Conexao.getConnection();
+        PreparedStatement stmt = null;
+        ArrayList dados = new ArrayList();
+        String[] Colunas = new String[]{"Titulo", "Autor", "Genero", "Ano", "Valor"};
+        String nomeac = null;
+        int cont = 0;
+        try {
+            
+            stmt = con.prepareStatement("SELECT * FROM clientes WHERE "+busca+"");
+            rs = stmt.executeQuery();
+            
+            
+            while(rs.next()){
+                dados.add(new Object[]{rs.getString("_titulo"), rs.getString("_autor"), rs.getString("_genero"), rs.getInt("_ano"), rs.getString("_valor")});
+                cont++;
+            }
+                
+            if(cont == 0){
+                JOptionPane.showMessageDialog(null, "Não Foram Encontrados Registros Para:  "+ busca);
+            }else{
+                
+                ModeloTabela modelo = new ModeloTabela(dados, Colunas);
+
+                table.setModel(modelo);
+
+                table.getColumnModel().getColumn(0).setPreferredWidth(216);
+                table.getColumnModel().getColumn(0).setResizable(false);
+
+                table.getColumnModel().getColumn(1).setPreferredWidth(216);
+                table.getColumnModel().getColumn(1).setResizable(false);
+
+                table.getColumnModel().getColumn(2).setPreferredWidth(155);
+                table.getColumnModel().getColumn(2).setResizable(false);
+
+                table.getColumnModel().getColumn(3).setPreferredWidth(150);
+                table.getColumnModel().getColumn(3).setResizable(false);
+
+                table.getColumnModel().getColumn(4).setPreferredWidth(150);
+                table.getColumnModel().getColumn(4).setResizable(false);
+
+                table.getTableHeader().setReorderingAllowed(false);
+                table.setAutoResizeMode(table.AUTO_RESIZE_OFF);
+
+                table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(buscarLivro.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

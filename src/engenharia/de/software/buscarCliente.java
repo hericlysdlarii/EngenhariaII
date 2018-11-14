@@ -228,17 +228,17 @@ public class buscarCliente extends javax.swing.JFrame {
     private javax.swing.JTextField nome_completo1;
     // End of variables declaration//GEN-END:variables
 
-    private void BuscarNomeCliente(String busca, String valor) {
+    private void BuscarNomeCliente(String busca, String nome) {
         ResultSet rs = null;
         Connection con = Conexao.getConnection();
         PreparedStatement stmt = null;
         ArrayList dados = new ArrayList();
-        String[] Colunas = new String[]{"Nome", "Nome da Mãe", "Telefone", "Idade", "Sexo"};
+        String[] Colunas = new String[]{"Nome", "Cpf", "Telefone", "Idade", "Sexo"};
         
         int cont = 0;
         try {
             //select pessoa.nome_completo from (select aluno.Id_pessoaFK as id from (select * from academia where academia.nome_academia="Academia Sol") as acad inner join aluno on aluno.Id_academiaFK = acad.Id_academia) as alu inner join pessoa on pessoa.Id_pessoa = alu.id;
-            stmt = con.prepareStatement("SELECT * FROM clientes WHERE "+busca+" LIKE '%"+valor+"%'");
+            stmt = con.prepareStatement("SELECT * FROM clientes WHERE "+busca+" ");
             rs = stmt.executeQuery();
             
             while(rs.next()){
@@ -247,7 +247,7 @@ public class buscarCliente extends javax.swing.JFrame {
             }
                 
             if(cont == 0){
-                JOptionPane.showMessageDialog(null, "Não Foram Encontrados Registros Para:  "+ valor);
+                JOptionPane.showMessageDialog(null, "Não Foram Encontrados Registros Para:  "+ busca);
             }else{
             
                 ModeloTabela modelo = new ModeloTabela(dados, Colunas);
@@ -281,17 +281,17 @@ public class buscarCliente extends javax.swing.JFrame {
         }
     }
 
-    private void BuscarCpfCliente(String busca, String valor) {
+    private void BuscarCpfCliente(String busca, String cpf) {
         ResultSet rs = null;
         Connection con = Conexao.getConnection();
         PreparedStatement stmt = null;
         ArrayList dados = new ArrayList();
-        String[] Colunas = new String[]{"Nome", "Nome da Mãe", "Telefone", "Idade", "Sexo"};
+        String[] Colunas = new String[]{"Nome", "Cpf", "Telefone", "Idade", "Sexo"};
         String nomeac = null;
         int cont = 0;
         try {
             
-            stmt = con.prepareStatement("SELECT * FROM clientes WHERE "+busca+" LIKE '%"+valor+"%'");
+            stmt = con.prepareStatement("SELECT * FROM clientes WHERE "+busca+"");
             rs = stmt.executeQuery();
             
             
